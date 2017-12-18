@@ -1,26 +1,26 @@
-package app
+package server
 
 import (
 	"net/http"
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 )
 
 type Router struct {
+	defaultHandler http.Handler
 }
 
-func NewRouter() *Router {
-	return &Router{}
-}
-
-func (router Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch r.RequestURI {
-	case "/api/restaurant":
-		writeToJson(w, GetRestaurants())
+func GetRouter() *Router {
+	return &Router{
+		defaultHandler: getHandler(),
 	}
 }
 
-func writeToJson(w http.ResponseWriter, data interface{}) {
+func (router Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	router.defaultHandler.ServeHTTP(w, r)
+}
+
+func toJson(w http.ResponseWriter, data interface{}) {
 	bs := bytes.Buffer{}
 	e := json.NewEncoder(&bs)
 	e.Encode(data)

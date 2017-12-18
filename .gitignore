@@ -1,2 +1,4 @@
 .idea
 white.iml
+vendor/*/
+.env
