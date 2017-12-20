@@ -3,11 +3,13 @@
 	"scripts": {
 	},
 	"env": {
+		"MONGODB_URI": {
+			"required": true
+		}
 	},
 	"formation": {
 	},
 	"addons": [
-
 	],
 	"buildpacks": [
 		{
