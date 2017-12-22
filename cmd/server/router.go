@@ -1,30 +1,31 @@
-package server
+package main
 
 import (
 	"net/http"
-	"bytes"
-	"encoding/json"
+	"github.com/julienschmidt/httprouter"
+	"github.com/megaminx/white/cmd/server/handlers"
 )
 
 type Router struct {
-	defaultHandler http.Handler
+	handler http.Handler
 }
 
-func GetRouter() *Router {
-	return &Router{
-		defaultHandler: getHandler(),
+func NewRouter() *Router {
+	r := &Router{
+		handler: getHandler(),
 	}
+	return r
 }
 
 func (router Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	router.defaultHandler.ServeHTTP(w, r)
+	router.handler.ServeHTTP(w, r)
 }
 
-func toJson(w http.ResponseWriter, data interface{}) {
-	bs := bytes.Buffer{}
-	e := json.NewEncoder(&bs)
-	e.Encode(data)
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-	bs.WriteTo(w)
+func getHandler() http.Handler {
+	r := httprouter.New()
+
+	r.GET("/api/users", handlers.GetUsers)
+	r.GET("/api/user/:username", handlers.GetUser)
+
+	return r
 }

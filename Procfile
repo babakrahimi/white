@@ -1,1 +1,1 @@
-web: white
+web: server
