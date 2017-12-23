@@ -33,6 +33,7 @@ func getHandler() http.Handler {
 
 	r.GET("/api/users", handlers.GetUsers)
 	r.GET("/api/user/:username", handlers.GetUser)
+	r.POST("/api/user", handlers.PostUser)
 
 	return r
 }

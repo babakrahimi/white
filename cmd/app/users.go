@@ -32,3 +32,14 @@ func (a *App) GetUsers() ([]User, error) {
 	}
 	return users, nil
 }
+
+func (a *App) AddUsers(users ...*User) ([]*User, error) {
+	for _, u := range users {
+		u.ID = bson.NewObjectId()
+	}
+
+	if err := a.Repository.db.C(collection).Insert(users); err != nil {
+		return nil, err
+	}
+	return users, nil
+}
