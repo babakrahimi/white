@@ -7,10 +7,12 @@ import (
 const collection = "users"
 
 type User struct {
-	ID        bson.ObjectId `json:"id" bson:"_id"`
-	FirstName string        `json:"firstName" bson:"firstName"`
-	LastName  string        `json:"lastName" bson:"lastName"`
-	Username  string        `json:"username" bson:"username"`
+	ID              bson.ObjectId `json:"id" bson:"_id"`
+	FirstName       string        `json:"firstName" bson:"firstName"`
+	LastName        string        `json:"lastName" bson:"lastName"`
+	Username        string        `json:"username" bson:"username"`
+	Email           string        `json:"email" bson:"email"`
+	BankCardNumbers []string      `json:"bankCardNumbers" bson:"bankCardNumbers"`
 }
 
 func (a *App) GetUser(username string) (*User, error) {
