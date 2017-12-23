@@ -51,7 +51,7 @@ func PostUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		toServerError(w, err)
 		return
 	}
-	nu, err := a.AddUsers(&u)
+	nu, err := a.AddUser(&u)
 	if err != nil {
 		toServerError(w, err)
 		return
