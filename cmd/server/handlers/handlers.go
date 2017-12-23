@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 )
 
-func toJson(w http.ResponseWriter, data interface{}) {
+func toOk(w http.ResponseWriter, data interface{}) {
 	bs := bytes.Buffer{}
 	e := json.NewEncoder(&bs)
 	e.Encode(data)

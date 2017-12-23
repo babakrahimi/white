@@ -17,7 +17,7 @@ func GetUser(w http.ResponseWriter, _ *http.Request, ps httprouter.Params) {
 		toServerError(w, err)
 		return
 	}
-	toJson(w, user)
+	toOk(w, user)
 }
 
 func GetUsers(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
@@ -32,5 +32,5 @@ func GetUsers(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 		toServerError(w, err)
 		return
 	}
-	toJson(w, users)
+	toOk(w, users)
 }
