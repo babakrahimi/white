@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"github.com/julienschmidt/httprouter"
 	"github.com/megaminx/white/cmd/app"
-	"encoding/json"
 )
 
 func GetUser(w http.ResponseWriter, _ *http.Request, ps httprouter.Params) {
@@ -36,25 +35,21 @@ func GetUsers(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 	toOk(w, users)
 }
 
-func PostUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	d := json.NewDecoder(r.Body)
-	u := app.User{}
-	err := d.Decode(&u)
-	if err != nil {
-		toServerError(w, err)
-		return
-	}
-	defer r.Body.Close()
+func PostUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	u := r.PostFormValue("username")
+	p := r.PostFormValue("password")
+	e := r.PostFormValue("email")
 
 	a, err := app.New()
 	if err != nil {
 		toServerError(w, err)
 		return
 	}
-	nu, err := a.AddUser(&u)
-	if err != nil {
+
+	if err = a.CreateUser(u, p, e); err != nil {
 		toServerError(w, err)
 		return
 	}
-	toCreated(w, nu)
+
+	w.WriteHeader(http.StatusCreated)
 }

@@ -2,6 +2,9 @@ package app
 
 import (
 	"gopkg.in/mgo.v2/bson"
+	"crypto/sha256"
+	"encoding/hex"
+	"crypto/rand"
 )
 
 const collection = "users"
@@ -11,6 +14,8 @@ type User struct {
 	FirstName       string        `json:"firstName" bson:"firstName"`
 	LastName        string        `json:"lastName" bson:"lastName"`
 	Username        string        `json:"username" bson:"username"`
+	Password        string        `json:"password" bson:"password"`
+	PasswordSalt    string        `json:"_" bson:"passwordSalt"`
 	Email           string        `json:"email" bson:"email"`
 	BankCardNumbers []string      `json:"bankCardNumbers" bson:"bankCardNumbers"`
 }
@@ -33,11 +38,38 @@ func (a *App) GetUsers() ([]User, error) {
 	return users, nil
 }
 
-func (a *App) AddUser(user *User) (*User, error) {
-	user.ID = bson.NewObjectId()
+func (a *App) CreateUser(username, password, email string) error {
+	ps := makePasswordSalt()
+	p := makeSecurePassword(password, ps)
+
+	user := &User{
+		ID:           bson.NewObjectId(),
+		Username:     username,
+		Email:        email,
+		PasswordSalt: ps,
+		Password:     p,
+	}
 
 	if err := a.Repository.db.C(collection).Insert(user); err != nil {
-		return nil, err
+		return err
 	}
-	return user, nil
+	return nil
+}
+
+func makeSecurePassword(password, salt string) string {
+	saltedPass := password + salt
+
+	h := sha256.New()
+	h.Write([]byte(saltedPass))
+
+	hashedPassword := hex.EncodeToString(h.Sum(nil))
+
+	return hashedPassword
+}
+
+func makePasswordSalt() string {
+	bs := make([]byte, 16)
+	rand.Read(bs)
+	salt := hex.EncodeToString(bs)
+	return salt
 }
