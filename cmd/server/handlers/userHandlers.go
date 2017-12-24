@@ -38,7 +38,6 @@ func GetUsers(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 func PostUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	u := r.PostFormValue("username")
 	p := r.PostFormValue("password")
-	e := r.PostFormValue("email")
 
 	a, err := app.New()
 	if err != nil {
@@ -46,7 +45,7 @@ func PostUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		return
 	}
 
-	if err = a.CreateUser(u, p, e); err != nil {
+	if err = a.CreateUser(u, p); err != nil {
 		toServerError(w, err)
 		return
 	}

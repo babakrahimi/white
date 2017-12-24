@@ -5,9 +5,21 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"crypto/rand"
+	"gopkg.in/mgo.v2"
+	"fmt"
 )
 
-const collection = "users"
+const (
+	collection = "users"
+)
+
+type DuplicateUsernameError struct {
+	Username string
+}
+
+func (e DuplicateUsernameError) Error() string {
+	return fmt.Sprintf("نام کاربری %v قبلا در سیستم ثبت شده", e.Username)
+}
 
 type User struct {
 	ID              bson.ObjectId `json:"id" bson:"_id"`
@@ -38,19 +50,21 @@ func (a *App) GetUsers() ([]User, error) {
 	return users, nil
 }
 
-func (a *App) CreateUser(username, password, email string) error {
+func (a *App) CreateUser(username, password string) error {
 	ps := makePasswordSalt()
 	p := makeSecurePassword(password, ps)
 
 	user := &User{
 		ID:           bson.NewObjectId(),
 		Username:     username,
-		Email:        email,
 		PasswordSalt: ps,
 		Password:     p,
 	}
 
 	if err := a.Repository.db.C(collection).Insert(user); err != nil {
+		if mgo.IsDup(err) {
+			return DuplicateUsernameError{ username}
+		}
 		return err
 	}
 	return nil
