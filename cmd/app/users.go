@@ -22,14 +22,19 @@ func (e DuplicateUsernameError) Error() string {
 }
 
 type User struct {
-	ID              bson.ObjectId `json:"id" bson:"_id"`
-	FirstName       string        `json:"firstName" bson:"firstName"`
-	LastName        string        `json:"lastName" bson:"lastName"`
-	Username        string        `json:"username" bson:"username"`
-	Password        string        `json:"password" bson:"password"`
-	PasswordSalt    string        `json:"_" bson:"passwordSalt"`
-	Email           string        `json:"email" bson:"email"`
-	BankCardNumbers []string      `json:"bankCardNumbers" bson:"bankCardNumbers"`
+	ID           bson.ObjectId `json:"_" bson:"_id"`
+	FirstName    string        `json:"firstName" bson:"firstName"`
+	LastName     string        `json:"lastName" bson:"lastName"`
+	Username     string        `json:"username" bson:"username"`
+	Password     string        `json:"password" bson:"password"`
+	PasswordSalt string        `json:"_" bson:"passwordSalt"`
+	Email        string        `json:"email" bson:"email"`
+	MobileNumber string        `json:"mobileNumber" bson:"mobileNumber"`
+	BankAccount  BankAccount   `json:"bankAccount" bson:"bankAccount"`
+}
+type BankAccount struct {
+	CardNumbers    []string `json:"cardNumbers" bson:"cardNumbers"`
+	AccountNumbers []string `json:"accountNumbers" bson:"accountNumbers"`
 }
 
 func (a *App) GetUser(username string) (*User, error) {
@@ -63,7 +68,7 @@ func (a *App) CreateUser(username, password string) error {
 
 	if err := a.Repository.db.C(collection).Insert(user); err != nil {
 		if mgo.IsDup(err) {
-			return DuplicateUsernameError{ username}
+			return DuplicateUsernameError{Username: username}
 		}
 		return err
 	}
