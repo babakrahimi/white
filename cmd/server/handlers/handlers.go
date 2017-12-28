@@ -6,24 +6,23 @@ import (
 	"encoding/json"
 )
 
-func toOk(w http.ResponseWriter, data interface{}) {
-	bs := bytes.Buffer{}
-	e := json.NewEncoder(&bs)
-	e.Encode(data)
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-	bs.WriteTo(w)
+func writeJSONValue(w http.ResponseWriter, data interface{}, httpStatus int) {
+	writeToResponse(w, data, httpStatus)
 }
 
-func writeJsonError(w http.ResponseWriter, err error, httpStatus int) {
+func writeJSONError(w http.ResponseWriter, err error, httpStatus int) {
 	e := struct {
 		Message string `json:"message"`
 	}{err.Error()}
+	writeToResponse(w, e, httpStatus)
+}
+
+func writeToResponse(w http.ResponseWriter, data interface{}, httpStatus int) {
 	bs := bytes.Buffer{}
 	enc := json.NewEncoder(&bs)
-	enc.Encode(e)
+	enc.Encode(data)
 
-	w.WriteHeader(httpStatus)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(httpStatus)
 	bs.WriteTo(w)
 }
