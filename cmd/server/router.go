@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"github.com/julienschmidt/httprouter"
 	"github.com/megaminx/white/cmd/server/handlers"
+	"github.com/rs/cors"
 )
 
 type Router struct {
@@ -18,22 +19,27 @@ func NewRouter() *Router {
 }
 
 func (router Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	allowCORS(w)
 	router.handler.ServeHTTP(w, r)
 }
 
-func allowCORS(w http.ResponseWriter) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+func getHandler() http.Handler {
+	hr := httprouter.New()
+
+	hr.GET("/api/users", handlers.GetUsers)
+	hr.GET("/api/user/:username", handlers.GetUser)
+	hr.POST("/api/user", handlers.PostUser)
+
+	h := getCORSHandler(hr)
+
+	return h
 }
 
-func getHandler() http.Handler {
-	r := httprouter.New()
-
-	r.GET("/api/users", handlers.GetUsers)
-	r.GET("/api/user/:username", handlers.GetUser)
-	r.POST("/api/user", handlers.PostUser)
-
-	return r
+func getCORSHandler(hr *httprouter.Router) http.Handler {
+	h := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedHeaders:   []string{"Content-Type"},
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
+	}).Handler(hr)
+	return h
 }
