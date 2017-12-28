@@ -8,6 +8,9 @@
 		},
 		"DB_NAME": {
 			"required": true
+		},
+		"JWT_SECRET": {
+			"required": true
 		}
 	},
 	"formation": {
