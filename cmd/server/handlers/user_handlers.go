@@ -17,7 +17,7 @@ func GetUser(w http.ResponseWriter, _ *http.Request, ps httprouter.Params) {
 		writeJSONError(w, err, http.StatusInternalServerError)
 		return
 	}
-	writeJSONValue(w, user)
+	writeJSONValue(w, user, http.StatusOK)
 }
 
 func GetUsers(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
@@ -32,7 +32,7 @@ func GetUsers(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 		writeJSONError(w, err, http.StatusInternalServerError)
 		return
 	}
-	writeJSONValue(w, users)
+	writeJSONValue(w, users, http.StatusOK)
 }
 
 func PostUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
