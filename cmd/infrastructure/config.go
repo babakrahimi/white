@@ -21,8 +21,8 @@ type (
 	}
 	EmailConfig struct {
 		ServerAddress           string
-		RegistrationAddress     string
-		RegistrationPassword    string
+		Username                string
+		Password                string
 		RegistrationRedirectURL string
 	}
 )
@@ -62,11 +62,11 @@ func GetConfig() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	ra, err := GetENVVariable("email_address_reg")
+	ra, err := GetENVVariable("email_username")
 	if err != nil {
 		return nil, err
 	}
-	rp, err := GetENVVariable("email_password_reg")
+	rp, err := GetENVVariable("email_password")
 	if err != nil {
 		return nil, err
 	}
@@ -85,8 +85,8 @@ func GetConfig() (*Config, error) {
 		JWTSecretKey:   jwt,
 		Email: &EmailConfig{
 			ServerAddress:           sa,
-			RegistrationAddress:     ra,
-			RegistrationPassword:    rp,
+			Username:                ra,
+			Password:                rp,
 			RegistrationRedirectURL: rru,
 		},
 		DB: &Database{

@@ -15,10 +15,10 @@
 		"EMAIL_SERVER": {
 			"required": true
 		},
-		"EMAIL_ADDRESS_REG": {
+		"EMAIL_USERNAME": {
 			"required": true
 		},
-		"EMAIL_PASSWORD_REG": {
+		"EMAIL_PASSWORD": {
 			"required": true
 		},
 		"REGISTRATION_REDIRECT_URL": {

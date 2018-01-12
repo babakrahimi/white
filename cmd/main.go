@@ -26,10 +26,19 @@ func main() {
 
 	ch := interfaces.CryptoHandler{SecretKey: c.JWTSecretKey}
 
+	eh := interfaces.EmailHandler{
+		Provider: &infrastructure.EmailServer{
+			ServerAddress: c.Email.ServerAddress,
+			Username:      c.Email.Username,
+			Password:      c.Email.Password,
+		},
+		RegistrationRedirectURL: c.Email.RegistrationRedirectURL,
+	}
+
 	ia := user.InvitationAgent{
 		Repository:    &repo,
 		CryptoHandler: &ch,
-		EmailHandler:  infrastructure.NewEmailHandler(c.Email),
+		EmailHandler:  &eh,
 	}
 
 	agents := infrastructure.Agents{
