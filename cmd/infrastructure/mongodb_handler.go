@@ -12,15 +12,15 @@ type (
 	}
 )
 
-func (mh *MongodbHandler) Store(data interface{}) error {
-	if err := mh.C("invitations").Insert(data); err != nil {
+func (mh *MongodbHandler) Store(data interface{}, to string) error {
+	if err := mh.C(to).Insert(data); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (mh *MongodbHandler) FindOne(conditions map[string]interface{}, result interface{}) error {
-	err := mh.C("invitations").Find(bson.M(conditions)).One(result)
+func (mh *MongodbHandler) FindOne(conditions map[string]interface{}, result interface{}, from string) error {
+	err := mh.C(from).Find(bson.M(conditions)).One(result)
 	if err == mgo.ErrNotFound {
 		return interfaces.ErrNotFound
 	}
@@ -30,7 +30,7 @@ func (mh *MongodbHandler) FindOne(conditions map[string]interface{}, result inte
 	return nil
 }
 
-func NewMongodbHandler(url, dbName string) (*MongodbHandler, error) {
+func NewMongodbHandler(url, dbName string) (interfaces.DBHandler, error) {
 	s, err := mgo.Dial(url)
 	if err != nil {
 		return nil, err

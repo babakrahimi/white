@@ -15,36 +15,50 @@ func main() {
 		log.Panic(err)
 	}
 
-	mh, err := infrastructure.NewMongodbHandler(c.DB.URL, c.DB.DBName)
+	mongodb, err := infrastructure.NewMongodbHandler(c.DB.URL, c.DB.DBName)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	repo := interfaces.InvitationRepo{
-		DB: mh,
-	}
-
-	ch := interfaces.CryptoHandler{SecretKey: c.JWTSecretKey}
-
-	eh := interfaces.EmailHandler{
-		Provider: &infrastructure.EmailServer{
-			ServerAddress: c.Email.ServerAddress,
-			Username:      c.Email.Username,
-			Password:      c.Email.Password,
-		},
-		RegistrationRedirectURL: c.Email.RegistrationRedirectURL,
-	}
-
-	ia := user.InvitationAgent{
-		Repository:    &repo,
-		CryptoHandler: &ch,
-		EmailHandler:  &eh,
-	}
+	crypto := NewCryptoHandler(c.JWTSecretKey)
+	email := NewEmailHandler(c.Email)
 
 	ops := infrastructure.Operators{
-		Invitation: &ia,
+		Invitation: GetInvitationOperator(mongodb, crypto, email),
 	}
 
 	ws := infrastructure.NewWebServer(ops, c.AllowedOrigins)
 	log.Fatal(http.ListenAndServe(":"+c.Port, ws))
+}
+
+func NewCryptoHandler(secretKey string) interfaces.CryptoHandler {
+	crypto := interfaces.CryptoHandler{SecretKey: secretKey}
+	return crypto
+}
+
+func NewEmailHandler(ec *infrastructure.EmailConfig) interfaces.EmailHandler {
+	eh := interfaces.EmailHandler{
+		Provider: &infrastructure.EmailServer{
+			ServerAddress: ec.ServerAddress,
+			Username:      ec.Username,
+			Password:      ec.Password,
+		},
+		RegistrationRedirectURL: ec.RegistrationRedirectURL,
+	}
+	return eh
+}
+
+func GetInvitationOperator(mh interfaces.DBHandler, ch interfaces.CryptoHandler, eh interfaces.EmailHandler) user.InvitationOperator {
+	invRepo := interfaces.InvitationRepo{
+		DB:          mh,
+		StorageName: "invitations",
+	}
+
+	ia := user.InvitationAgent{
+		Repository:    &invRepo,
+		CryptoHandler: &ch,
+		EmailHandler:  &eh,
+	}
+
+	return ia
 }

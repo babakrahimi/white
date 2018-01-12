@@ -12,17 +12,18 @@ var (
 
 type (
 	InvitationRepo struct {
-		DB DBHandler
+		DB          DBHandler
+		StorageName string
 	}
 
 	DBHandler interface {
-		Store(data interface{}) error
-		FindOne(conditions map[string]interface{}, result interface{}) error
+		Store(data interface{}, to string) error
+		FindOne(conditions map[string]interface{}, result interface{}, from string) error
 	}
 )
 
 func (r *InvitationRepo) Store(invitation *user.Invitation) error {
-	if err := r.DB.Store(invitation); err != nil {
+	if err := r.DB.Store(invitation, r.StorageName); err != nil {
 		return err
 	}
 	return nil
@@ -33,7 +34,7 @@ func (r InvitationRepo) Find(email string) (*user.Invitation, error) {
 	c["email"] = email
 
 	var result user.Invitation
-	err := r.DB.FindOne(c, &result)
+	err := r.DB.FindOne(c, &result, r.StorageName)
 	if err == ErrNotFound {
 		return nil, nil
 	}
