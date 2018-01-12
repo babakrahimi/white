@@ -20,10 +20,10 @@ type (
 		URL, DBName string
 	}
 	EmailConfig struct {
-		ServerAddress           string
-		Username                string
-		Password                string
-		RegistrationRedirectURL string
+		ServerAddress string
+		Username      string
+		Password      string
+		SignUpURL     string
 	}
 )
 
@@ -54,7 +54,7 @@ func GetConfig() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	rru, err := GetENVVariable("registration_redirect_url")
+	su, err := GetENVVariable("signup_url")
 	if err != nil {
 		return nil, err
 	}
@@ -84,10 +84,10 @@ func GetConfig() (*Config, error) {
 		AllowedOrigins: strings.Split(ao, ","),
 		JWTSecretKey:   jwt,
 		Email: &EmailConfig{
-			ServerAddress:           sa,
-			Username:                ra,
-			Password:                rp,
-			RegistrationRedirectURL: rru,
+			ServerAddress: sa,
+			Username:      ra,
+			Password:      rp,
+			SignUpURL:     su,
 		},
 		DB: &Database{
 			URL:    du,

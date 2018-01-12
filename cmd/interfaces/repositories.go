@@ -17,24 +17,33 @@ type (
 	}
 
 	DBHandler interface {
-		Store(data interface{}, to string) error
-		FindOne(conditions map[string]interface{}, result interface{}, from string) error
+		Store(selector map[string]interface{}, data interface{}, to string) error
+		FindOne(selector map[string]interface{}, result interface{}, from string) error
 	}
 )
 
+func (r *InvitationRepo) Verify(invitation *user.Invitation) error {
+	s := make(map[string]interface{})
+	s["email"] = invitation.Email
+	if err := r.DB.Store(s, invitation, r.StorageName); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *InvitationRepo) Store(invitation *user.Invitation) error {
-	if err := r.DB.Store(invitation, r.StorageName); err != nil {
+	if err := r.DB.Store(nil, invitation, r.StorageName); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (r InvitationRepo) Find(email string) (*user.Invitation, error) {
-	c := make(map[string]interface{})
-	c["email"] = email
+	s := make(map[string]interface{})
+	s["email"] = email
 
 	var result user.Invitation
-	err := r.DB.FindOne(c, &result, r.StorageName)
+	err := r.DB.FindOne(s, &result, r.StorageName)
 	if err == ErrNotFound {
 		return nil, nil
 	}

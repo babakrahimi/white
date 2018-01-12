@@ -26,7 +26,7 @@ func main() {
 		Username:      c.Email.Username,
 		Password:      c.Email.Password,
 	}
-	email := interfaces.NewEmailHandler(es, c.Email.RegistrationRedirectURL)
+	email := interfaces.NewEmailHandler(es, c.Email.SignUpURL)
 
 	ops := infrastructure.Operators{
 		Invitation: GetInvitationOperator(mongodb, crypto, email),
@@ -42,7 +42,7 @@ func GetInvitationOperator(mh interfaces.DBHandler, ch user.CryptoHandler, eh us
 		StorageName: "invitations",
 	}
 
-	a := user.InvitationAgent{
+	a := &user.InvitationAgent{
 		Repository:    invRepo,
 		CryptoHandler: ch,
 		EmailHandler:  eh,

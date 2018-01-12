@@ -3,6 +3,8 @@ package infrastructure
 import (
 	"net/http"
 
+	"encoding/json"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/megaminx/white/cmd/business/user"
 	"github.com/rs/cors"
@@ -26,6 +28,7 @@ func NewWebServer(ops Operators, allowedOrigins []string) http.Handler {
 	r := httprouter.New()
 
 	r.POST("/invite", GetInviteUserHandler(ops))
+	r.POST("/verify", GetVerifyInvitationHandler(ops))
 
 	ws := &WebServerHandler{
 		Router: r,
@@ -37,12 +40,46 @@ func NewWebServer(ops Operators, allowedOrigins []string) http.Handler {
 	}).Handler(ws)
 }
 
+func GetVerifyInvitationHandler(ops Operators) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		token := r.PostFormValue("token")
+		email, err := ops.Invitation.VerifyInvitation(token)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusForbidden)
+			return
+		}
+
+		data := struct {
+			Email    string `json:"email"`
+			Verified bool   `json:"verified"`
+		}{
+			Email:    email,
+			Verified: true,
+		}
+		if err := WriteJSON(w, data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+}
+
 func GetInviteUserHandler(ops Operators) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		email := r.PostFormValue("email")
-		err := ops.Invitation.InviteUser(email)
-		if err != nil {
+		if err := ops.Invitation.InviteUser(email); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
 		}
 	}
+}
+
+func WriteJSON(w http.ResponseWriter, data interface{}) error {
+	b, err := json.Marshal(&data)
+	if err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(b)
+	return nil
 }

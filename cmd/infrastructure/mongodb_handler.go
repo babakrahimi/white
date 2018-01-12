@@ -12,15 +12,16 @@ type (
 	}
 )
 
-func (mh *MongodbHandler) Store(data interface{}, to string) error {
-	if err := mh.C(to).Insert(data); err != nil {
+func (mh *MongodbHandler) Store(selector map[string]interface{}, data interface{}, to string) error {
+	_, err := mh.C(to).Upsert(selector, data)
+	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (mh *MongodbHandler) FindOne(conditions map[string]interface{}, result interface{}, from string) error {
-	err := mh.C(from).Find(bson.M(conditions)).One(result)
+func (mh *MongodbHandler) FindOne(selector map[string]interface{}, result interface{}, from string) error {
+	err := mh.C(from).Find(bson.M(selector)).One(result)
 	if err == mgo.ErrNotFound {
 		return interfaces.ErrNotFound
 	}
