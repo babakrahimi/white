@@ -1,6 +1,9 @@
 package user
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
 
 var (
 	ErrInvalidInvitationToken = errors.New("invalid invitation token")
@@ -25,8 +28,9 @@ type (
 	}
 
 	Invitation struct {
-		Email    string `json:"email" bson:"email"`
-		Verified bool   `json:"verified" bson:"verified"`
+		Email     string    `json:"email" bson:"email"`
+		Verified  bool      `json:"verified" bson:"verified"`
+		CreatedAt time.Time `json:"-" bson:"createdAt"`
 	}
 
 	InvitationOperator interface {
@@ -72,7 +76,7 @@ func (a *InvitationAgent) InviteUser(email string) error {
 		return err
 	}
 
-	invitation := &Invitation{Email: email}
+	invitation := &Invitation{Email: email, CreatedAt: time.Now()}
 	if err := a.Repository.Store(invitation); err != nil {
 		return err
 	}
