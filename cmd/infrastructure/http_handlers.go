@@ -9,25 +9,25 @@ import (
 )
 
 type (
-	Agents struct {
+	Operators struct {
 		Invitation user.InvitationOperator
 	}
 
-	WebServiceHandler struct {
+	WebServerHandler struct {
 		Router *httprouter.Router
 	}
 )
 
-func (ws *WebServiceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (ws *WebServerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ws.Router.ServeHTTP(w, r)
 }
 
-func NewWebService(agents Agents, allowedOrigins []string) http.Handler {
+func NewWebServer(ops Operators, allowedOrigins []string) http.Handler {
 	r := httprouter.New()
 
-	r.POST("/invite", GetInviteUserHandler(agents))
+	r.POST("/invite", GetInviteUserHandler(ops))
 
-	ws := &WebServiceHandler{
+	ws := &WebServerHandler{
 		Router: r,
 	}
 	return cors.New(cors.Options{
@@ -37,10 +37,10 @@ func NewWebService(agents Agents, allowedOrigins []string) http.Handler {
 	}).Handler(ws)
 }
 
-func GetInviteUserHandler(agents Agents) httprouter.Handle {
+func GetInviteUserHandler(ops Operators) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		email := r.PostFormValue("email")
-		err := agents.Invitation.InviteUser(email)
+		err := ops.Invitation.InviteUser(email)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}

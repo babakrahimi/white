@@ -41,10 +41,10 @@ func main() {
 		EmailHandler:  &eh,
 	}
 
-	agents := infrastructure.Agents{
+	ops := infrastructure.Operators{
 		Invitation: &ia,
 	}
 
-	ws := infrastructure.NewWebService(agents, c.AllowedOrigins)
+	ws := infrastructure.NewWebServer(ops, c.AllowedOrigins)
 	log.Fatal(http.ListenAndServe(":"+c.Port, ws))
 }
