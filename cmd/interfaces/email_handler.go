@@ -11,9 +11,9 @@ import (
 )
 
 type EmailHandler struct {
-	MailServer MailServer
-	Sender     string
-	BaseUrl    string
+	MailServer              MailServer
+	Sender                  string
+	RegistrationRedirectURL string
 }
 type MailServer struct {
 	ServerAddress string
@@ -36,7 +36,7 @@ func (mp *EmailHandler) SendInvitationEmail(to, token string) error {
 		body += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 
-	content, err := getInvitationEmailContent(mp.BaseUrl, token)
+	content, err := getInvitationEmailContent(mp.RegistrationRedirectURL, token)
 	if err != nil {
 		return err
 	}
