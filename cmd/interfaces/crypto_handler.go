@@ -5,14 +5,19 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
-
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/megaminx/white/cmd/business/user"
 )
 
 type CryptoHandler struct {
 	SecretKey string
+}
+
+func NewCryptoHandler(secretKey string) user.CryptoHandler {
+	crypto := &CryptoHandler{SecretKey: secretKey}
+	return crypto
 }
 
 func (ch *CryptoHandler) GetInvitationToken(email string) (string, error) {
@@ -42,18 +47,6 @@ func (ch *CryptoHandler) GetRandomSalt() string {
 	bs := make([]byte, 16)
 	rand.Read(bs)
 	return hex.EncodeToString(bs)
-}
-
-func (ch *CryptoHandler) GetEmailVerificationToken(data string) string {
-	panic("implement me")
-}
-
-func (ch *CryptoHandler) VerifyToken(token string) error {
-	panic("implement me")
-}
-
-func (ch *CryptoHandler) GetEmailFromToken(token string) string {
-	panic("implement me")
 }
 
 func (ch *CryptoHandler) HashPassword(password, salt string) string {

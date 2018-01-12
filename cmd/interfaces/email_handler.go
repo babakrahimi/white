@@ -3,6 +3,8 @@ package interfaces
 import (
 	"bytes"
 	"html/template"
+
+	"github.com/megaminx/white/cmd/business/user"
 )
 
 type (
@@ -16,6 +18,13 @@ type (
 	}
 )
 
+func NewEmailHandler(p EmailServerProvider, redirectURL string) user.EmailHandler {
+	eh := &EmailHandler{
+		Provider:                p,
+		RegistrationRedirectURL: redirectURL,
+	}
+	return eh
+}
 func (eh *EmailHandler) SendInvitationEmail(to, token string) error {
 	subject := "عضویت در سامانه"
 	content, err := GetInvitationEmailContent(eh.RegistrationRedirectURL, token)
