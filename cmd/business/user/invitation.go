@@ -21,6 +21,10 @@ type (
 		Visited bool   `json:"visited" bson:"visited"`
 	}
 
+	InvitationOperator interface {
+		InviteUser(email string) error
+	}
+
 	InvitationAgent struct {
 		Repository    InvitationRepository
 		CryptoHandler CryptoHandler

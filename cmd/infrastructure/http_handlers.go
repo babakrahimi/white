@@ -10,7 +10,7 @@ import (
 
 type (
 	Agents struct {
-		Invitation *user.InvitationAgent
+		Invitation user.InvitationOperator
 	}
 
 	WebServiceHandler struct {
