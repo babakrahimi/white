@@ -25,13 +25,13 @@ type (
 	}
 
 	Invitation struct {
-		Email   string `json:"email" bson:"email"`
-		Visited bool   `json:"visited" bson:"visited"`
+		Email    string `json:"email" bson:"email"`
+		Verified bool   `json:"verified" bson:"verified"`
 	}
 
 	InvitationOperator interface {
 		InviteUser(email string) error
-		VerifyInvitation(token string) (string, error)
+		VerifyInvitation(token string) (*Invitation, error)
 	}
 
 	InvitationAgent struct {
@@ -41,26 +41,26 @@ type (
 	}
 )
 
-func (a *InvitationAgent) VerifyInvitation(token string) (string, error) {
+func (a *InvitationAgent) VerifyInvitation(token string) (*Invitation, error) {
 	email, err := a.CryptoHandler.VerifyInvitationToken(token)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	inv, err := a.Repository.Find(email)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	if inv == nil {
-		return "", ErrNotInvitedUser
+		return nil, ErrNotInvitedUser
 	}
 
-	inv.Visited = true
+	inv.Verified = true
 	if err := a.Repository.Verify(inv); err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return email, nil
+	return inv, nil
 }
 
 func (a *InvitationAgent) InviteUser(email string) error {

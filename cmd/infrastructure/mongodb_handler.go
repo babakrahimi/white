@@ -12,8 +12,15 @@ type (
 	}
 )
 
-func (mh *MongodbHandler) Store(selector map[string]interface{}, data interface{}, to string) error {
-	_, err := mh.C(to).Upsert(selector, data)
+func (mh *MongodbHandler) Store(data interface{}, to string) error {
+	err := mh.C(to).Insert(data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (mh *MongodbHandler) Update(selector map[string]interface{}, data interface{}, to string) error {
+	err := mh.C(to).Update(selector, data)
 	if err != nil {
 		return err
 	}

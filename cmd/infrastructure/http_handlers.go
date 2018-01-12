@@ -43,20 +43,13 @@ func NewWebServer(ops Operators, allowedOrigins []string) http.Handler {
 func GetVerifyInvitationHandler(ops Operators) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		token := r.PostFormValue("token")
-		email, err := ops.Invitation.VerifyInvitation(token)
+		inv, err := ops.Invitation.VerifyInvitation(token)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusForbidden)
 			return
 		}
 
-		data := struct {
-			Email    string `json:"email"`
-			Verified bool   `json:"verified"`
-		}{
-			Email:    email,
-			Verified: true,
-		}
-		if err := WriteJSON(w, data); err != nil {
+		if err := WriteJSON(w, inv); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
