@@ -316,7 +316,6 @@ td[class="spechide"]
 
       </body>
       </html>
-  
 `
 	t := template.Must(template.New("email").Parse(body))
 	b := bytes.NewBufferString("")
