@@ -252,7 +252,7 @@ td[class="spechide"]
                                   <td align='center' bgcolor='#1A54BA' style='background:#69C374; padding:15px 18px;-webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px;'>
                                     <div class="contentEditableContainer contentTextEditable">
                                       <div class="contentEditable" align='center'>
-                                        <a target='_blank' href='{{.URL}}?t={{.Token}}' class='link2' style='color:#ffffff;'>{{.URL}}</a>
+                                        <a target='_blank' href='{{.URL}}?t={{.Token}}' class='link2' style='color:#ffffff;'>عضویت</a>
                                       </div>
                                     </div>
                                   </td>
